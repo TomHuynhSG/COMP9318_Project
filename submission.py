@@ -1,3 +1,6 @@
+#Name: Tom & James
+#COMP9318
+
 import helper
 def fool_classifier(test_data): ## Please do not change the function defination...
     ## Read the test data file, i.e., 'test_data.txt' from Present Working Directory...
