@@ -16,7 +16,7 @@ def get_freq_of_tokens(ls):
 def fool_classifier(test_data): ## Please do not change the function defination...
 
     #Training SVM (for testing purpose)
-    training = helper.strategy()
+    strategy_instance = helper.strategy()
 
     #data provided in strategy class
 
@@ -24,21 +24,21 @@ def fool_classifier(test_data): ## Please do not change the function defination.
 
     #make each distinct word into a set
     features = set()
-    for i in training.class0:
+    for i in strategy_instance.class0:
         features = features | set(i)
 
-    for i in training.class1:
+    for i in strategy_instance.class1:
         features = features | set(i)
 
     features = list(features) #changed so the features is in order and can be used for other purpose
 
     #creating a dict per list (per doc)
     newlist0 = []
-    for i in training.class0:
+    for i in strategy_instance.class0:
         newlist0.append(get_freq_of_tokens(i))
 
     newlist1 = []
-    for i in training.class1:
+    for i in strategy_instance.class1:
         newlist1.append(get_freq_of_tokens(i))
 
     newdict = dict.fromkeys(features, 0)
@@ -75,32 +75,20 @@ def fool_classifier(test_data): ## Please do not change the function defination.
     parameter = {'gamma': 'auto', 'C': 1.0 ,'kernel': 'linear','degree': 3 ,'coef0': 0.0}
     
     #using own bag of words
-    model = training.train_svm(parameter, x_data, ydata)
+    model = strategy_instance.train_svm(parameter, x_data, ydata)
 
     weights = model.coef_.tolist()
 
     #apply abs to all of weights
     newweights = [abs(x) for x in weights[0]]
 
-    #finding top 20
+    #sorting and indexing the coefficients
     sortweights = list(reversed(sorted(newweights)))
-    top = sortweights[0:20]
+    #top = sortweights[0:20]
     idx_top = list()
-    for i in range(20):
-        idx = newweights.index(top[i])
+    for i in range(len(sortweights)):
+        idx = newweights.index(sortweights[i])
         idx_top.append(idx)  
-
-    #finding out top 20 features words
-    top_words = list()
-    for i in range(20):
-        top_words.append(features[idx_top[i]])
-
-    #pair up words with their real coefficient
-    top_words_coef = list()
-    for i in range(20):
-        top_words_coef.append((top_words[i],weights[0][idx_top[i]]))
-
-    top_dict = dict(top_words_coef)
     
     #open the test data
     test_data = "D:/MyStudy/Data Warehousing & Data Mining/Project for Data Warehousing/test_data.txt"
@@ -113,29 +101,36 @@ def fool_classifier(test_data): ## Please do not change the function defination.
             w = i.split()
             list_par.append(w)
 
-        #check and modify every paragraph
+         #check and modify every paragraph
         constant = 100 #nb of words will be inserted
+        columns = list(x_data.columns.values) #list of features
         for i in range(len(list_par)):
 
-            #check it against top 20 words
-            for w in top_words:
+            count_changes = 0 #count the nb of token changed
 
-                if w in list_par[i]:
+            #modify the words from the top features until count_changes == 20
+            for w_ind in idx_top:
 
+                if columns[w_ind] in list_par[i]:
                     #if positive words found
-                    if top_dict[w] < 0: #originally ">"
-                        list_par[i] = list(filter(lambda a: a != w, list_par[i])) #removing features with (+) weight
+                    if weights[0][w_ind] < 0: #originally ">"
+                        list_par[i] = list(filter(lambda a: a != columns[w_ind], list_par[i])) #removing features with (+) weight
+                        count_changes += 1
 
                     #if negative words found
-                    elif top_dict[w] > 0: #originally "<
-                        list_par[i] = list_par[i] + [w]*constant #add constant number of negative words into it
+                    elif weights[0][w_ind] > 0: #originally "<
+                        list_par[i] = list_par[i] + [columns[w_ind]]*constant #add constant number of negative words into it
 
                 else:
 
                     #if negative word isn't there then add it
-                    if top_dict[w] > 0: #originally "<"
-                        list_par[i] = list_par[i] + [w]*constant
+                    if weights[0][w_ind] > 0: #originally "<"
+                        list_par[i] = list_par[i] + [columns[w_ind]]*constant
+                        count_changes += 1
 
+                if count_changes == 20:
+                    break
+                    
     #create modified test text
     modified_data = "D:/MyStudy/Data Warehousing & Data Mining/Project for Data Warehousing/modified_data.txt"
     with open(modified_data, "w+") as moddata:
@@ -153,6 +148,6 @@ def fool_classifier(test_data): ## Please do not change the function defination.
     
     
     ## You can check that the modified text is within the modification limits.
-    modified_data='./modified_data.txt'
+    #modified_data='./modified_data.txt'
     assert strategy_instance.check_data(test_data, modified_data)
     return strategy_instance ## NOTE: You are required to return the instance of this class.
