@@ -102,7 +102,7 @@ def fool_classifier(test_data): ## Please do not change the function defination.
             list_par.append(w)
 
          #check and modify every paragraph
-        constant = 100 #nb of words will be inserted
+        constant = 6 #nb of words will be inserted
         columns = list(x_data.columns.values) #list of features
         for i in range(len(list_par)):
 
