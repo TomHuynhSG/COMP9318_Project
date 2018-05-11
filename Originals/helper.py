@@ -48,9 +48,6 @@ class strategy:
     
     ## Function to check the Modification Limits...(Modify EXACTLY 20- DISTINCT TOKENS)
     def check_data(self, original_file, modified_file):
-
-
-        print ("Haha")
         with open(original_file, 'r') as infile:
             data=[line.strip().split(' ') for line in infile]
         Original={}
