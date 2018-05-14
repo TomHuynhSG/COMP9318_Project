@@ -82,15 +82,12 @@ def fool_classifier(test_data): ## Please do not change the function defination.
 
     weights = model.coef_.tolist()
 
-    #apply abs to all of weights
-    newweights = [abs(x) for x in weights[0]]
-
     #sorting and indexing the coefficients
-    sortweights = list(reversed(sorted(newweights)))
+    sortweights = list(reversed(sorted(weights[0])))
     #top = sortweights[0:20]
     idx_top = list()
     for i in range(len(sortweights)):
-        idx = newweights.index(sortweights[i])
+        idx = weights[0].index(sortweights[i])
         idx_top.append(idx)  
     
     #open the test data
