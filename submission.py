@@ -89,7 +89,7 @@ def fool_classifier(test_data): ## Please do not change the function defination.
         idx_top.append(idx)  
     
     #open the test data
-    test_data = "D:/MyStudy/Data Warehousing & Data Mining/Project for Data Warehousing/test_data.txt"
+    test_data = "test_data.txt"
 
     with open(test_data) as tdata:
 
@@ -130,7 +130,7 @@ def fool_classifier(test_data): ## Please do not change the function defination.
                     break
                     
     #create modified test text
-    modified_data = "D:/MyStudy/Data Warehousing & Data Mining/Project for Data Warehousing/modified_data.txt"
+    modified_data = "modified_data.txt"
     with open(modified_data, "w+") as moddata:
 
         #change list_par into list of string
