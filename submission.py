@@ -1,18 +1,19 @@
 #Name: Tom & James
 #COMP9318
 
-import helper
 import pandas
+import helper
 
-def get_binary_token(ls):
+def get_freq_of_tokens(ls):
     tokens = {}
     for token in ls:
         if token not in tokens:
             tokens[token] = 1
+        else:
+            tokens[token] += 1
     return tokens
 
 def fool_classifier(test_data): ## Please do not change the function defination...
-
     #Training SVM (for testing purpose)
     strategy_instance = helper.strategy()
 
@@ -33,11 +34,13 @@ def fool_classifier(test_data): ## Please do not change the function defination.
     #creating a dict per list (per doc)
     newlist0 = []
     for i in strategy_instance.class0:
-        newlist0.append(get_binary_token(i))
+        newlist0.append(get_freq_of_tokens(i))
+
+    #print(newlist0)
 
     newlist1 = []
     for i in strategy_instance.class1:
-        newlist1.append(get_binary_token(i))
+        newlist1.append(get_freq_of_tokens(i))
 
     newdict = dict.fromkeys(features, 0)
 
@@ -47,7 +50,7 @@ def fool_classifier(test_data): ## Please do not change the function defination.
         tmp_dict = dict(newdict)
         for i in row:
             if i in newdict:
-                tmp_dict[i] = 1
+                tmp_dict[i]+= row[i]
         xdata.append(tmp_dict)
 
 
@@ -56,7 +59,7 @@ def fool_classifier(test_data): ## Please do not change the function defination.
         tmp_dict = dict(newdict)
         for i in row:
             if i in newdict:
-                tmp_dict[i] = 1
+                tmp_dict[i]+= row[i]
         xdata.append(tmp_dict)
 
     ydata = []
@@ -66,6 +69,8 @@ def fool_classifier(test_data): ## Please do not change the function defination.
         ydata.append(1)
 
     x_data = pandas.DataFrame(xdata)
+    #x_train, and y_train done
+    #or create a df with index (if you know exactly the number of rows), the use df.loc[x] to input the row
     #x_train, and y_train done
     #or create a df with index (if you know exactly the number of rows), the use df.loc[x] to input the row
    
@@ -89,7 +94,7 @@ def fool_classifier(test_data): ## Please do not change the function defination.
         idx_top.append(idx)  
     
     #open the test data
-    test_data = "test_data.txt"
+    test_data = "D:/MyStudy/Data Warehousing & Data Mining/Assignment/COMP9318_Project/test_data.txt"
 
     with open(test_data) as tdata:
 
@@ -100,7 +105,7 @@ def fool_classifier(test_data): ## Please do not change the function defination.
             list_par.append(w)
 
          #check and modify every paragraph
-        constant = 1 #nb of words will be inserted
+        constant = 2 #nb of words will be inserted
         columns = list(x_data.columns.values) #list of features
         for i in range(len(list_par)):
 
@@ -130,7 +135,7 @@ def fool_classifier(test_data): ## Please do not change the function defination.
                     break
                     
     #create modified test text
-    modified_data = "modified_data.txt"
+    modified_data = "D:/MyStudy/Data Warehousing & Data Mining/Assignment/COMP9318_Project/modified_data.txt"
     with open(modified_data, "w+") as moddata:
 
         #change list_par into list of string
