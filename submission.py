@@ -4,13 +4,11 @@
 import helper
 import pandas
 
-def get_freq_of_tokens(ls):
+def get_binary_token(ls):
     tokens = {}
     for token in ls:
         if token not in tokens:
             tokens[token] = 1
-        else:
-            tokens[token] += 1
     return tokens
 
 def fool_classifier(test_data): ## Please do not change the function defination...
@@ -35,11 +33,11 @@ def fool_classifier(test_data): ## Please do not change the function defination.
     #creating a dict per list (per doc)
     newlist0 = []
     for i in strategy_instance.class0:
-        newlist0.append(get_freq_of_tokens(i))
+        newlist0.append(get_binary_token(i))
 
     newlist1 = []
     for i in strategy_instance.class1:
-        newlist1.append(get_freq_of_tokens(i))
+        newlist1.append(get_binary_token(i))
 
     newdict = dict.fromkeys(features, 0)
 
@@ -49,7 +47,7 @@ def fool_classifier(test_data): ## Please do not change the function defination.
         tmp_dict = dict(newdict)
         for i in row:
             if i in newdict:
-                tmp_dict[i]+= row[i]
+                tmp_dict[i] = 1
         xdata.append(tmp_dict)
 
 
@@ -58,7 +56,7 @@ def fool_classifier(test_data): ## Please do not change the function defination.
         tmp_dict = dict(newdict)
         for i in row:
             if i in newdict:
-                tmp_dict[i]+= row[i]
+                tmp_dict[i] = 1
         xdata.append(tmp_dict)
 
     ydata = []
@@ -102,7 +100,7 @@ def fool_classifier(test_data): ## Please do not change the function defination.
             list_par.append(w)
 
          #check and modify every paragraph
-        constant = 100 #nb of words will be inserted
+        constant = 1 #nb of words will be inserted
         columns = list(x_data.columns.values) #list of features
         for i in range(len(list_par)):
 
@@ -113,18 +111,18 @@ def fool_classifier(test_data): ## Please do not change the function defination.
 
                 if columns[w_ind] in list_par[i]:
                     #if positive words found
-                    if weights[0][w_ind] < 0: #originally ">"
+                    if weights[0][w_ind] > 0: #originally ">"
                         list_par[i] = list(filter(lambda a: a != columns[w_ind], list_par[i])) #removing features with (+) weight
                         count_changes += 1
 
                     #if negative words found
-                    elif weights[0][w_ind] > 0: #originally "<
+                    elif weights[0][w_ind] < 0: #originally "<
                         list_par[i] = list_par[i] + [columns[w_ind]]*constant #add constant number of negative words into it
 
                 else:
 
                     #if negative word isn't there then add it
-                    if weights[0][w_ind] > 0: #originally "<"
+                    if weights[0][w_ind] < 0: #originally "<"
                         list_par[i] = list_par[i] + [columns[w_ind]]*constant
                         count_changes += 1
 
