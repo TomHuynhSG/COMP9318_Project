@@ -14,14 +14,12 @@ def get_freq_of_tokens(ls):
     return tokens
 
 def fool_classifier(test_data): ## Please do not change the function defination...
-    #Training SVM (for testing purpose)
+    #Training SVM (for testing purpose) using the class given
     strategy_instance = helper.strategy()
 
-    #data provided in strategy class
+    #-----TURN DATA TO BAG OF WORDS-----
 
-    #turn data to bag of words (refer to wikipedia or other sources)
-
-    #make each distinct word into a set
+    #finding features of all paragraphs (class0 and class1)
     features = set()
     for i in strategy_instance.class0:
         features = features | set(i)
@@ -29,31 +27,27 @@ def fool_classifier(test_data): ## Please do not change the function defination.
     for i in strategy_instance.class1:
         features = features | set(i)
 
-    features = list(features) #changed so the features is in order and can be used for other purpose
+    features = list(features) #changed features data type into a list 
 
-    #creating a dict per list (per doc)
-    newlist0 = []
+    #creating a list of dict (every dict represent a paragraph)
+    newlist0 = [] #newlist0 represent list of dict for class0 paragraph
     for i in strategy_instance.class0:
         newlist0.append(get_freq_of_tokens(i))
 
-    #print(newlist0)
-
-    newlist1 = []
+    newlist1 = [] #newlist1 represent list of dict for class1 paragraph
     for i in strategy_instance.class1:
         newlist1.append(get_freq_of_tokens(i))
 
-    newdict = dict.fromkeys(features, 0)
+    newdict = dict.fromkeys(features, 0) # make a dict with features as it's key with starting value is 0 for all keys
 
-    #make a list of dict representing the whole data
-    xdata = []
+    #creating a list of dict combining all paragraph from class0 and class1 using a dict with all features
+    #basically this is the Frequency Bag of Words    xdata = []
     for row in newlist0:
         tmp_dict = dict(newdict)
         for i in row:
             if i in newdict:
                 tmp_dict[i]+= row[i]
         xdata.append(tmp_dict)
-
-
 
     for row in newlist1:
         tmp_dict = dict(newdict)
@@ -62,17 +56,14 @@ def fool_classifier(test_data): ## Please do not change the function defination.
                 tmp_dict[i]+= row[i]
         xdata.append(tmp_dict)
 
+    #creating a list of y value
     ydata = []
     for i in range(len(newlist0)):
         ydata.append(0)
     for i in range(len(newlist1)):
         ydata.append(1)
 
-    x_data = pandas.DataFrame(xdata)
-    #x_train, and y_train done
-    #or create a df with index (if you know exactly the number of rows), the use df.loc[x] to input the row
-    #x_train, and y_train done
-    #or create a df with index (if you know exactly the number of rows), the use df.loc[x] to input the row
+    x_data = pandas.DataFrame(xdata) #changed the type of xdata into a pandas.dataframe
    
     #training SVM using default parameter
     parameter = {'gamma': 'auto', 'C': 1.0 ,'kernel': 'linear','degree': 3 ,'coef0': 0.0}
@@ -84,14 +75,13 @@ def fool_classifier(test_data): ## Please do not change the function defination.
 
     #sorting and indexing the coefficients
     sortweights = list(reversed(sorted(weights[0])))
-    #top = sortweights[0:20]
     idx_top = list()
     for i in range(len(sortweights)):
         idx = weights[0].index(sortweights[i])
         idx_top.append(idx)  
     
     #open the test data
-    test_data = "D:/MyStudy/Data Warehousing & Data Mining/Assignment/COMP9318_Project/test_data.txt"
+    test_data = "./test_data.txt"
 
     with open(test_data) as tdata:
 
@@ -113,18 +103,18 @@ def fool_classifier(test_data): ## Please do not change the function defination.
 
                 if columns[w_ind] in list_par[i]:
                     #if positive words found
-                    if weights[0][w_ind] > 0: #originally ">"
+                    if weights[0][w_ind] > 0:
                         list_par[i] = list(filter(lambda a: a != columns[w_ind], list_par[i])) #removing features with (+) weight
                         count_changes += 1
 
                     #if negative words found
-                    elif weights[0][w_ind] < 0: #originally "<
+                    elif weights[0][w_ind] < 0: 
                         list_par[i] = list_par[i] + [columns[w_ind]]*constant #add constant number of negative words into it
 
                 else:
 
                     #if negative word isn't there then add it
-                    if weights[0][w_ind] < 0: #originally "<"
+                    if weights[0][w_ind] < 0: 
                         list_par[i] = list_par[i] + [columns[w_ind]]*constant
                         count_changes += 1
 
@@ -132,7 +122,7 @@ def fool_classifier(test_data): ## Please do not change the function defination.
                     break
                     
     #create modified test text
-    modified_data = "D:/MyStudy/Data Warehousing & Data Mining/Assignment/COMP9318_Project/modified_data.txt"
+    modified_data = "./modified_data.txt"
     with open(modified_data, "w+") as moddata:
 
         #change list_par into list of string
