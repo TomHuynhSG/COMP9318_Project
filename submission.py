@@ -4,6 +4,7 @@
 import pandas
 import helper
 
+
 def get_freq_of_tokens(ls):
     tokens = {}
     for token in ls:
@@ -41,7 +42,8 @@ def fool_classifier(test_data): ## Please do not change the function defination.
     newdict = dict.fromkeys(features, 0) # make a dict with features as it's key with starting value is 0 for all keys
 
     #creating a list of dict combining all paragraph from class0 and class1 using a dict with all features
-    #basically this is the Frequency Bag of Words    xdata = []
+    #basically this is the Frequency Bag of Words    
+    xdata = []
     for row in newlist0:
         tmp_dict = dict(newdict)
         for i in row:
@@ -66,7 +68,7 @@ def fool_classifier(test_data): ## Please do not change the function defination.
     x_data = pandas.DataFrame(xdata) #changed the type of xdata into a pandas.dataframe
    
     #training SVM using default parameter
-    parameter = {'gamma': 'auto', 'C': 1.0 ,'kernel': 'linear','degree': 3 ,'coef0': 0.0}
+    parameter = {'gamma': 'auto', 'C': 0.005 ,'kernel': 'linear','degree': 3 ,'coef0': 0.0}
     
     #using own bag of words
     model = strategy_instance.train_svm(parameter, x_data, ydata)
@@ -81,7 +83,7 @@ def fool_classifier(test_data): ## Please do not change the function defination.
         idx_top.append(idx)  
     
     #open the test data
-    test_data = "./test_data.txt"
+    #test_data = "./test_data.txt"
 
     with open(test_data) as tdata:
 
@@ -141,3 +143,8 @@ def fool_classifier(test_data): ## Please do not change the function defination.
     #modified_data='./modified_data.txt'
     assert strategy_instance.check_data(test_data, modified_data)
     return strategy_instance ## NOTE: You are required to return the instance of this class.
+
+
+# Testing section
+# test_data='./test_data.txt'
+# strategy_instance = fool_classifier(test_data) 
